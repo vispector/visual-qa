@@ -20,7 +20,7 @@ The last operation is unsupported by the current backend; it must be reported as
 
 ## Test and implementation
 
-`/vis-test /path/to/screenshot.png [taxonomy-path] ["predicate"]` inspects once. The original Visual QA outcome remains intact; an optional predicate is evaluated by the agent against observed evidence after inspection. Treat uncertainty as non-success. The runtime also supports direct candidate discovery:
+`/vis-test /path/to/screenshot.png [taxonomy-path] ["predicate"]` inspects once. Compare the inspection's `revision_id` and `workspace_version` with paginated spec reads and every complete spec read. A changed or missing version means the spec snapshot is unproven. The original Visual QA outcome remains intact; an optional predicate is evaluated by the agent against observed evidence after inspection. Treat uncertainty as non-success. The runtime also supports direct candidate discovery:
 
 ```sh
 node "$CODEX_HOME/skills/vispector-visual-qa-runtime/upload-image.mjs" decompose ./screen.png "navigation and account panel" 0,0,1000,700

@@ -41,7 +41,11 @@ export async function main(argv = process.argv.slice(2), client = new VispectorM
   while (Date.now() - started < timeout) {
     await sleep(delay);
     const state = await client.callTool('get_inspection', { inspection_id: accepted.inspection_id });
-    if (state.status === 'completed') return { ...state, revision_id: accepted.revision_id };
+    if (state.status === 'completed' || state.status === 'failed' || state.status === 'aborted') return {
+      ...state,
+      revision_id: state.revision_id || accepted.revision_id,
+      workspace_version: state.workspace_version || accepted.workspace_version,
+    };
     if (state.status === 'failed' || state.status === 'aborted') throw new Error(`Inspection ${state.status}: ${state.execution_error || state.error || 'no error details returned'}`);
     if (!['scheduled', 'running'].includes(state.status)) throw new Error(`Unsupported inspection status: ${state.status}`);
     delay = Math.min(Math.round(delay * 1.5), 10000);
@@ -51,7 +55,9 @@ export async function main(argv = process.argv.slice(2), client = new VispectorM
 
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
   try {
-    process.stdout.write(`${JSON.stringify(await main(), null, 2)}\n`);
+    const result = await main();
+    process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+    if (result.status === 'failed' || result.status === 'aborted') process.exitCode = 1;
   } catch (error) {
     console.error(error instanceof Error ? error.message : String(error));
     process.exitCode = 1;

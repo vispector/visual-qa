@@ -82,3 +82,67 @@ test('inspect command submits once and polls the accepted inspection ID', async 
     await rm(directory, { recursive: true, force: true });
   }
 });
+
+test('failed inspection preserves identifiers and remains an execution failure', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'vispector-failed-'));
+  const imagePath = join(directory, 'screen.png');
+  await writeFile(imagePath, Buffer.from([137,80,78,71,13,10,26,10,0]));
+  const calls = [];
+  const client = {
+    async connect() {},
+    async callTool(name, args) {
+      calls.push({ name, args });
+      return name === 'run_inspect'
+        ? { inspection_id: 'failed-id', status: 'scheduled', revision_id: 'rev-id', workspace_version: 'version-id' }
+        : { inspection_id: 'failed-id', status: 'failed', execution_error: 'provider unavailable' };
+    },
+  };
+  const oldInterval = process.env.VISPECTOR_POLL_INTERVAL_MS;
+  const oldTimeout = process.env.VISPECTOR_POLL_TIMEOUT_MS;
+  process.env.VISPECTOR_POLL_INTERVAL_MS = '250';
+  process.env.VISPECTOR_POLL_TIMEOUT_MS = '1000';
+  try {
+    const result = await runImageCommand(['inspect', imagePath, 'sample-project', 'settings/profile'], client);
+    assert.equal(result.status, 'failed');
+    assert.equal(result.inspection_id, 'failed-id');
+    assert.equal(result.revision_id, 'rev-id');
+    assert.equal(result.workspace_version, 'version-id');
+    assert.equal(result.execution_error, 'provider unavailable');
+    assert.deepEqual(calls.map(({ name }) => name), ['run_inspect', 'get_inspection']);
+  } finally {
+    if (oldInterval === undefined) delete process.env.VISPECTOR_POLL_INTERVAL_MS; else process.env.VISPECTOR_POLL_INTERVAL_MS = oldInterval;
+    if (oldTimeout === undefined) delete process.env.VISPECTOR_POLL_TIMEOUT_MS; else process.env.VISPECTOR_POLL_TIMEOUT_MS = oldTimeout;
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test('poll timeout reports the accepted ID and does not resubmit', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'vispector-timeout-'));
+  const imagePath = join(directory, 'screen.png');
+  await writeFile(imagePath, Buffer.from([137,80,78,71,13,10,26,10,0]));
+  const calls = [];
+  const client = {
+    async connect() {},
+    async callTool(name, args) {
+      calls.push({ name, args });
+      return name === 'run_inspect'
+        ? { inspection_id: 'pending-id', status: 'scheduled' }
+        : { inspection_id: 'pending-id', status: 'running' };
+    },
+  };
+  const oldInterval = process.env.VISPECTOR_POLL_INTERVAL_MS;
+  const oldTimeout = process.env.VISPECTOR_POLL_TIMEOUT_MS;
+  process.env.VISPECTOR_POLL_INTERVAL_MS = '250';
+  process.env.VISPECTOR_POLL_TIMEOUT_MS = '250';
+  try {
+    await assert.rejects(
+      runImageCommand(['inspect', imagePath, 'sample-project', 'settings/profile'], client),
+      /timed out after 250ms\. Inspection pending-id remains available/,
+    );
+    assert.deepEqual(calls.map(({ name }) => name), ['run_inspect', 'get_inspection']);
+  } finally {
+    if (oldInterval === undefined) delete process.env.VISPECTOR_POLL_INTERVAL_MS; else process.env.VISPECTOR_POLL_INTERVAL_MS = oldInterval;
+    if (oldTimeout === undefined) delete process.env.VISPECTOR_POLL_TIMEOUT_MS; else process.env.VISPECTOR_POLL_TIMEOUT_MS = oldTimeout;
+    await rm(directory, { recursive: true, force: true });
+  }
+});

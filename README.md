@@ -28,4 +28,4 @@ Read [setup and authentication](docs/setup.md), [skill usage](docs/usage.md), [l
 
 ## Current support limits
 
-The authenticated MCP endpoint supports async `decompose_ui`, `run_inspect`, and `get_inspection`. Context and spec CRUD use the organization-scoped management tools. Some Phase 5 capabilities remain unavailable: natural-language saved specification assertions, explicit historical revision reads on spec tools, and taxonomy-folder Workbench deep links. Project and specification editor links are supported when the Workbench base URL is configured. The skills must report limits rather than claim success.
+The authenticated MCP endpoint supports async `decompose_ui`, `run_inspect`, and `get_inspection`. Context and spec CRUD use the organization-scoped management tools. Some Phase 5 capabilities remain unavailable: natural-language saved specification assertions and taxonomy-folder Workbench deep links. Project and specification editor links are supported when the Workbench base URL is configured. The skills must report limits rather than claim success.
