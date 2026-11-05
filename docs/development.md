@@ -2,10 +2,10 @@
 
 ## Files and behavior
 
-- `skills/*/SKILL.md` are Codex skills. Keep prompts short and place extended guidance here.
+- `skills/*/SKILL.md` use the portable Agent Skills format supported by Codex, Claude Code, and OpenCode. Keep prompts short and place extended guidance here.
 - `runtime/mcp.mjs` implements authenticated Streamable HTTP initialization, tool calls, local image reading, and polling helpers using Node built-ins.
 - `runtime/upload-image.mjs` supports `inspect` and `decompose`. Inspection submits once with an idempotency key and polls by inspection ID only.
-- `install.sh` installs exactly five skills and the shared runtime under `$CODEX_HOME/skills`.
+- `install.sh` installs exactly five skills and the shared runtime under `VISPECTOR_SKILLS_DIR`, defaulting to `$CODEX_HOME/skills` or `~/.codex/skills`.
 
 The runtime accepts PNG, JPEG, and WebP signatures, then relies on Vispector's server-side decoder, MIME match, upload, pixel, and processing checks for full image validation. It stores no image in a temporary file. Error output may include service responses; review before sharing logs.
 
@@ -15,7 +15,7 @@ Measured as UTF-8 bytes of the installed `SKILL.md` prompt file (front matter in
 
 Current local UTF-8 byte counts: `vis-context` 1,320; `vis-list-areas` 981; `vis-spec` 1,580; `vis-test` 1,874; `vis-impl` 1,097. Run local checks with `node --test runtime/test.mjs` and `bash -n install.sh`. Synthetic checks do not validate public distribution or a live service.
 
-The installer supports `VISPECTOR_SKILLS_SOURCE=<local-checkout>` for offline packaging checks. Point `CODEX_HOME` at a fresh temporary directory, pre-create an unrelated file, run the installer, and confirm the skills/runtime were copied while that file remains. Public installation must still be checked against the published URL and ref.
+The installer supports `VISPECTOR_SKILLS_SOURCE=<local-checkout>` for offline packaging checks. Point `VISPECTOR_SKILLS_DIR` at a fresh temporary directory, pre-create an unrelated file, run the installer, and confirm the skills/runtime were copied while that file remains. Public installation must still be checked against the published URL and ref.
 
 ## MCP contract
 

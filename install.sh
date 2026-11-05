@@ -3,7 +3,7 @@ set -euo pipefail
 
 repo="https://github.com/vispector/visual-qa.git"
 ref="${VISPECTOR_SKILLS_REF:-main}"
-root="${CODEX_HOME:-$HOME/.codex}/skills"
+root="${VISPECTOR_SKILLS_DIR:-${CODEX_HOME:-$HOME/.codex}/skills}"
 tmp="$(mktemp -d)"
 cleanup() { rm -rf "$tmp"; }
 trap cleanup EXIT

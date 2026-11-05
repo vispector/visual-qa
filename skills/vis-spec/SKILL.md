@@ -3,7 +3,7 @@ name: vis-spec
 description: Show or make user-directed edits to a Vispector Visual QA specification.
 ---
 
-Syntax: `/vis-spec <spec-slug> <show|create|add|update|remove|assert> [region-id] [description] [--taxonomy-path <path>]`. The spec slug is mandatory and is a terminal taxonomy slug, never a backend ID or region ID. Parse `add:`, `update:`, and `remove:` only when their target is unambiguous.
+Invocation: run the `vis-spec` skill (slash command `/vis-spec` in clients that support it). Arguments: `<spec-slug> <show|create|add|update|remove|assert> [region-id] [description] [--taxonomy-path <path>]`. The spec slug is mandatory and is a terminal taxonomy slug, never a backend ID or region ID. Parse `add:`, `update:`, and `remove:` only when their target is unambiguous.
 
 Resolve active conversation context; an explicit taxonomy path overrides it for this operation only. The complete target path is `<parent>/<spec-slug>`. A pending parent becomes established only after successful `create_spec`. Read the full current spec and workspace version first. Use `create_spec` or `update_spec`; preserve unrelated items and stable IDs. On a conflict, reread and review. Validate slug/depth constraints and distinguish region IDs from spec slugs.
 
