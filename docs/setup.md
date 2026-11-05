@@ -52,7 +52,7 @@ For Codex, add the same remote Streamable HTTP endpoint and bearer token to the 
 
 Review `install.sh` before running it. The one-line install uses the public `main` branch. Set `VISPECTOR_SKILLS_REF` to a release tag for a pinned install. Re-running updates the owned skill/runtime files. The installer defaults to `${CODEX_HOME:-$HOME/.codex}/skills`; set `VISPECTOR_SKILLS_DIR` to the target skill root for another client. Use `~/.claude/skills` for Claude Code or `~/.config/opencode/skills` for OpenCode, and make that variable available to the agent's shell when it runs screenshot commands. To remove the installation, delete only `vis-context`, `vis-list-areas`, `vis-spec`, `vis-test`, `vis-impl`, and `vispector-visual-qa-runtime` from the selected root.
 
-The installer has not been tested against a published public repository/ref in this checkout. Public availability, clean-machine installation, and release pinning remain acceptance items until the repository and release are published.
+For local checkout installation, set `VISPECTOR_SKILLS_SOURCE` to the repository path. Published installs use the selected public branch or tag.
 
 ### Client documentation
 

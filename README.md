@@ -38,8 +38,8 @@ curl -fsSL https://raw.githubusercontent.com/vispector/visual-qa/main/install.sh
 
 Install a published pinned ref with `curl -fsSL https://raw.githubusercontent.com/vispector/visual-qa/<tag>/install.sh | VISPECTOR_SKILLS_REF=<tag> VISPECTOR_SKILLS_DIR=<skills-directory> bash` after a release tag exists. Re-run the installer to update. To uninstall, remove the five `vis-*` directories and `vispector-visual-qa-runtime` from the same skills directory. The installer replaces only files it owns in those paths.
 
-Read [setup and authentication](docs/setup.md), [skill usage](docs/usage.md), [limitations](docs/limitations.md), and [developer notes](docs/development.md) before production use. Client-specific skill discovery, invocation, and MCP configuration are summarized in the setup and usage guides.
+Read [setup and authentication](docs/setup.md), [skill usage](docs/usage.md), [behavior and errors](docs/limitations.md), and [developer notes](docs/development.md) before production use. Client-specific skill discovery, invocation, and MCP configuration are summarized in the setup and usage guides.
 
-## Current support limits
+## Supported capabilities
 
-The authenticated MCP endpoint supports async `decompose_ui`, `run_inspect`, and `get_inspection`. Context and spec CRUD use the organization-scoped management tools. Some Phase 5 capabilities remain unavailable: natural-language saved specification assertions and taxonomy-folder Workbench deep links. Project and specification editor links are supported when the Workbench base URL is configured. The skills must report limits rather than claim success.
+The authenticated MCP endpoint supports async `decompose_ui`, `run_inspect`, and `get_inspection`; context and spec operations use the organization-scoped management tools. Visual QA specifications support a screen-level assertion through `semantic_context`, region and attention checks, and taxonomy-scoped inspection. Workbench links are available for projects and specifications when the Workbench base URL is configured; taxonomy folders do not have a direct Workbench route.

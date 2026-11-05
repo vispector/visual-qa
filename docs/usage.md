@@ -14,7 +14,7 @@ When one skill refers to another (for example, implementation verification needs
 
 Use `/vis-context <project-slug/taxonomy-path>` to resolve context, or `/vis-context` to reuse this conversation's active context. Existing paths must be resolved. A requested new taxonomy path is pending until a specification is created. Project creation requires a confirmed name, slug, type, and settings.
 
-Use `/vis-context list [taxonomy-path]` to list specs at the current context's next level. With a folder context, this returns only specs directly inside that folder; deeper descendant specs are excluded. With a spec path, it returns only that spec. Without a path, it uses the active context. The command paginates `list_specs`, then reads each selected spec with `get_spec` to show its metadata, semantic context, regions, and region checks. Saved top-level natural-language spec assertions are not supported by the current schema, so the output reports that limit rather than presenting `semantic_context` as an assertion.
+Use `/vis-context list [taxonomy-path]` to list specs at the current context's next level. With a folder context, this returns only specs directly inside that folder; deeper descendant specs are excluded. With a spec path, it returns only that spec. Without a path, it uses the active context. The command paginates `list_specs`, then reads each selected spec with `get_spec` to show its metadata, screen-level assertion (`semantic_context`), regions, and region checks.
 
 Use `/vis-context show [taxonomy-path]` for a compact tree of the entire context subtree, including folders and specs at every depth. It recursively paginates `list_taxonomy` and prints only node names/slugs and whether each is a folder or spec; it does not load or display spec details. A spec path shows only that spec leaf.
 
@@ -30,11 +30,11 @@ Examples:
 - `/vis-spec subscription remove billing-panel`
 - `/vis-spec subscription assert "Plan and renewal date are aligned"`
 
-The last operation is unsupported by the current backend; it must be reported as such. A spec path is built from parent path plus slug. Read before writing, use the current workspace version, and resolve conflicts by rereading.
+`assert` sets the screen-level assertion stored as `semantic_context`; region-specific requirements belong in region checks. A spec path is built from parent path plus slug. Read before writing, use the current workspace version, and resolve conflicts by rereading.
 
 ## Test and implementation
 
-`vis-test /path/to/screenshot.png [taxonomy-path] ["predicate"]` inspects once. Compare the inspection's `revision_id` and `workspace_version` with paginated spec reads and every complete spec read. A changed or missing version means the spec snapshot is unproven. The original Visual QA outcome remains intact; an optional predicate is evaluated by the agent against observed evidence after inspection. Treat uncertainty as non-success. The runtime also supports direct candidate discovery:
+`vis-test /path/to/screenshot.png [taxonomy-path] ["predicate"]` inspects once against the revision pinned for that job. Preserve its `revision_id` and `workspace_version` as provenance. The original Visual QA outcome remains intact; an optional predicate is evaluated by the agent against observed evidence after inspection. Treat uncertainty as non-success. The runtime also supports direct candidate discovery:
 
 ```sh
 node "$VISPECTOR_SKILLS_DIR/vispector-visual-qa-runtime/upload-image.mjs" decompose ./screen.png "navigation and account panel" 0,0,1000,700
