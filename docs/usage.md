@@ -14,6 +14,10 @@ When one skill refers to another (for example, implementation verification needs
 
 Use `/vis-context <project-slug/taxonomy-path>` to resolve context, or `/vis-context` to reuse this conversation's active context. Existing paths must be resolved. A requested new taxonomy path is pending until a specification is created. Project creation requires a confirmed name, slug, type, and settings.
 
+Use `/vis-context list [taxonomy-path]` to list specs at the current context's next level. With a folder context, this returns only specs directly inside that folder; deeper descendant specs are excluded. With a spec path, it returns only that spec. Without a path, it uses the active context. The command paginates `list_specs`, then reads each selected spec with `get_spec` to show its metadata, semantic context, regions, and region checks. Saved top-level natural-language spec assertions are not supported by the current schema, so the output reports that limit rather than presenting `semantic_context` as an assertion.
+
+Use `/vis-context show [taxonomy-path]` for a compact tree of the entire context subtree, including folders and specs at every depth. It recursively paginates `list_taxonomy` and prints only node names/slugs and whether each is a folder or spec; it does not load or display spec details. A spec path shows only that spec leaf.
+
 `/vis-list-areas <image-path>` runs `decompose_ui`. Add a short hint and optional normalized focus bounds. Returned findings are candidates, not saved specs. Compare with all pages from `list_specs`; obtain the user's selection and confirmation before creating anything.
 
 ## Specifications

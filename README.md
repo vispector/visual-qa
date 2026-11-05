@@ -4,7 +4,7 @@ This repository distributes five Agent Skills (`SKILL.md`) for the authenticated
 
 ## Workflow
 
-Configure an authenticated Vispector MCP endpoint, install the skills, establish a project context, then use `vis-list-areas`, `vis-spec`, `vis-test`, and `vis-impl` as needed. Codex and Claude Code support direct slash invocation such as `/vis-test`; OpenCode exposes skills through its native skill tool, so ask the agent to use the named skill. Discovery only proposes candidates. Saving a specification requires the user's direction. Predicate evaluation happens after inspection against returned observations; it does not trigger a second inspection.
+Configure an authenticated Vispector MCP endpoint, install the skills, establish a project context, use `vis-context show` for a subtree tree or `vis-context list` for direct child specs, then use `vis-list-areas`, `vis-spec`, `vis-test`, and `vis-impl` as needed. Codex and Claude Code support direct slash invocation such as `/vis-test`; OpenCode exposes skills through its native skill tool, so ask the agent to use the named skill. Discovery only proposes candidates. Saving a specification requires the user's direction. Predicate evaluation happens after inspection against returned observations; it does not trigger a second inspection.
 
 ## Requirements and installation
 
