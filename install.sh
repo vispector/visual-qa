@@ -17,11 +17,11 @@ else
   git clone --quiet --depth 1 --branch "$ref" "$repo" "$tmp/repo"
   source="$tmp/repo"
 fi
-for path in skills/vis-context/SKILL.md skills/vis-list-areas/SKILL.md skills/vis-spec/SKILL.md skills/vis-test/SKILL.md skills/vis-impl/SKILL.md runtime/upload-image.mjs runtime/mcp.mjs; do
+for path in skills/vis-context/SKILL.md skills/vis-image/SKILL.md skills/vis-spec/SKILL.md skills/vis-test/SKILL.md skills/vis-impl/SKILL.md runtime/local-server.mjs runtime/upload-image.mjs runtime/mcp.mjs; do
   [[ -f "$source/$path" ]] || { echo "install: source is missing $path" >&2; exit 1; }
 done
 mkdir -p "$root"
-for skill in vis-context vis-list-areas vis-spec vis-test vis-impl; do
+for skill in vis-context vis-image vis-spec vis-test vis-impl; do
   target="$root/$skill"
   mkdir -p "$target"
   install -m 0644 "$source/skills/$skill/SKILL.md" "$target/SKILL.md"
@@ -30,4 +30,5 @@ runtime="$root/vispector-visual-qa-runtime"
 mkdir -p "$runtime"
 install -m 0644 "$source/runtime/upload-image.mjs" "$runtime/upload-image.mjs"
 install -m 0644 "$source/runtime/mcp.mjs" "$runtime/mcp.mjs"
-printf 'Installed Vispector Visual QA skills (%s) to %s\n' "$ref" "$root"
+install -m 0644 "$source/runtime/local-server.mjs" "$runtime/local-server.mjs"
+printf 'Installed Vispector Visual QA skills and local MCP server (%s) to %s\n' "$ref" "$root"

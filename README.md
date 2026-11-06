@@ -1,16 +1,26 @@
 # Vispector Visual QA skills
 
-This repository distributes five Agent Skills (`SKILL.md`) for the authenticated Vispector MCP server: context discovery, candidate area discovery, Visual QA specification management, screenshot testing, and implementation verification. The agent uses its own visual and semantic reasoning; Vispector remains responsible for authorization, revision selection, inspection execution, and billing. The skill instructions are client-neutral; discovery and invocation depend on the agent client.
+This repository distributes five Agent Skills (`SKILL.md`) plus a local stdio MCP server: project context, image discovery and specification proposals, Visual QA specification management, screenshot testing, and implementation verification. The local server reads image paths and sends base64 directly to the authenticated remote Vispector MCP using the configured bearer API key; image bytes never enter model context. Vispector remains responsible for authorization, revision selection, inspection execution, and billing.
 
 ## Workflow
 
-Configure an authenticated Vispector MCP endpoint, install the skills, establish a project context, use `vis-context show` for a subtree tree or `vis-context list` for direct child specs, then use `vis-list-areas`, `vis-spec`, `vis-test`, and `vis-impl` as needed. Codex and Claude Code support direct slash invocation such as `/vis-test`; OpenCode exposes skills through its native skill tool, so ask the agent to use the named skill. Discovery only proposes candidates. Saving a specification requires the user's direction. Predicate evaluation happens after inspection against returned observations; it does not trigger a second inspection.
+Configure local and remote MCP access, install the skills, establish context with `vis-context`, use `vis-context show` or `vis-context list`, then use `vis-image`, `vis-spec`, `vis-test`, and `vis-impl` as needed. Discovery only proposes candidates. Saving a specification requires explicit confirmation of the presented proposal. Predicate evaluation happens after inspection against returned observations; it does not trigger a second inspection.
+
+The local server executable is `vispector-local-mcp`. To start it directly from the repository's published GitHub ref:
+
+```sh
+npx -y --package=github:vispector/visual-qa#main vispector-local-mcp
+```
+
+MCP clients should use the same command and pass `VISPECTOR_MCP_URL`, `VISPECTOR_API_KEY`, and `VISPECTOR_WORKING_DIR` in the server environment. The referenced GitHub ref must contain the package manifest and local server.
 
 ## Requirements and installation
 
-Requirements: an agent client that supports the Agent Skills `SKILL.md` format and authenticated remote MCP, Node.js 18 or newer for screenshot operations, and a Vispector API key with MCP access. Set `VISPECTOR_MCP_URL` to the Streamable HTTP endpoint (for example `https://<host>/mcp/`) and `VISPECTOR_MCP_TOKEN` to the API key in the environment used by the agent and runtime. Never put the token in this repository or a skill prompt.
+Requirements: an agent client that supports the Agent Skills `SKILL.md` format and local stdio plus authenticated remote MCP, Node.js 18 or newer, Git, and a Vispector API key with MCP permissions. The client starts the local server with `npx`; its first launch fetches this GitHub package. Set `VISPECTOR_MCP_URL` to the Streamable HTTP endpoint (for example `https://<host>/mcp/`) and `VISPECTOR_API_KEY` in the local server's environment. This is the same bearer credential used for remote MCP access. Set `VISPECTOR_WORKING_DIR` to the base directory for relative image paths, or use the MCP client's working directory. Never put the token in this repository, a skill, or a model-visible configuration file.
 
 The files are compatible with Codex, Claude Code, and OpenCode. The installer defaults to Codex's `~/.codex/skills`; set `VISPECTOR_SKILLS_DIR` to the skill directory used by another client. Claude Code uses `~/.claude/skills`; OpenCode uses `~/.config/opencode/skills`. These are installation options, not a claim that every client/version has been tested end to end.
+
+Read [setup and authentication](docs/setup.md), [skill usage](docs/usage.md), [behavior and errors](docs/limitations.md), and [developer notes](docs/development.md) for local-server configuration, context lifetime, errors, and the five supported skills.
 
 Inspect the installer first:
 
