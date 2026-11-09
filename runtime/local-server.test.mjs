@@ -40,8 +40,7 @@ test('rejects malformed context syntax before remote discovery', async () => {
   assert.equal(JSON.parse(result.result.content[0].text).code, 'INVALID_CONTEXT');
 });
 
-test('creates missing projects and accepts logical taxonomy paths, preserving context on failure', async () => {
-  let denied = false;
+test('creates missing projects only when explicitly requested and preserves context on failure', async () => {
   const calls = [];
   const client = {
     async connect() {},
@@ -49,7 +48,6 @@ test('creates missing projects and accepts logical taxonomy paths, preserving co
       calls.push({ name, args });
       if (name === 'list_projects') return { items: [] };
       if (name === 'create_project') {
-        if (denied) throw new Error('{"code":"permission_denied"}');
         assert.equal(args.slug, 'sample');
         assert.equal(args.name, 'sample');
         assert.equal(args.project_type, 'visual-qa');
@@ -60,15 +58,13 @@ test('creates missing projects and accepts logical taxonomy paths, preserving co
     },
   };
   const set = await handleMessage({ jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: 'vis_set_context', arguments: { context: 'sample/settings' } } }, client);
-  assert.deepEqual(set.result.structuredContent, {
+  assert.equal(JSON.parse(set.result.content[0].text).code, 'PROJECT_NOT_FOUND');
+  assert.deepEqual(calls.map((call) => call.name), ['list_projects']);
+  const created = await handleMessage({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'vis_set_context', arguments: { context: 'sample/settings', create_if_missing: true } } }, client);
+  assert.deepEqual(created.result.structuredContent, {
     project_id: 'project-1', project_slug: 'sample', project_created: true, taxonomy_path: 'settings', revision_id: 'rev-2', workspace_version: 'ws-2',
   });
-  assert.deepEqual(calls.map((call) => call.name), ['list_projects', 'create_project']);
-  denied = true;
-  const failed = await handleMessage({ jsonrpc: '2.0', id: 2, method: 'tools/call', params: { name: 'vis_set_context', arguments: { context: 'sample/missing' } } }, client);
-  assert.equal(JSON.parse(failed.result.content[0].text).code, 'PROJECT_ACCESS_DENIED');
-  const current = await handleMessage({ jsonrpc: '2.0', id: 3, method: 'tools/call', params: { name: 'vis_get_context', arguments: {} } }, client);
-  assert.equal(current.result.structuredContent.taxonomy_path, 'settings');
+  assert.deepEqual(calls.map((call) => call.name), ['list_projects', 'list_projects', 'create_project']);
 });
 
 test('reads image bytes inside local MCP, submits base64 once remotely, and returns only real inspection evidence', async () => {

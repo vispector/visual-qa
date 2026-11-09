@@ -16,7 +16,7 @@ Audited 2026-11-06 against the current Vispector backend and the existing skill 
 
 The local server is packaged as the zero-dependency `vispector-local-mcp` executable and can be started with `npx --package=github:vispector/visual-qa#main vispector-local-mcp`.
 
-`vis_set_context` accepts only the project context string. It searches paginated `list_projects`, creates a missing Visual QA project through `create_project`, and atomically replaces process-local state after success. A taxonomy prefix is retained without listing specs or creating nodes. Project creation needs the remote write grant; conflicts and access failures do not change the selected context.
+`vis_set_context` accepts a project context string and optional `create_if_missing` flag. It searches paginated `list_projects`; existing projects are selected, while missing or inaccessible projects return an error without changing context unless `create_if_missing=true` is explicitly supplied. The skill must obtain user confirmation before setting that flag. A taxonomy prefix is retained without listing specs or creating nodes.
 
 ## Verification boundaries
 

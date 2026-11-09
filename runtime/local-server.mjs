@@ -69,11 +69,15 @@ async function resolveContext(input, client) {
     cursor = page.next_cursor || undefined;
   } while (!project && cursor);
 
-  const projectCreated = !project;
-  if (projectCreated) {
+  let projectCreated = false;
+  if (!project) {
+    if (input.create_if_missing !== true) {
+      throw Object.assign(new Error('Project not found or not accessible. Confirm creation before retrying with create_if_missing=true.'), { code: 'PROJECT_NOT_FOUND' });
+    }
     project = await client.callTool('create_project', {
       name: slug, slug, project_type: 'visual-qa', idempotency_key: randomUUID(),
     });
+    projectCreated = true;
   }
   const next = {
     project_id: project.project_id || project.id,
@@ -181,9 +185,10 @@ async function uploadImage(input, client) {
 const TOOLS = [
   {
     name: 'vis_set_context',
-    description: 'Select process-local context from project-slug[/taxonomy/prefix]. An absent project is created as a Visual QA project; the taxonomy prefix is a logical scope and need not exist yet. Requires project read and, for creation, write permission.',
+    description: 'Select process-local context using project-slug[/taxonomy/prefix]. Existing projects are selected directly. A missing project is created only when create_if_missing=true; set that flag only after explicit user confirmation. The taxonomy prefix is a logical scope and need not exist yet.',
     inputSchema: { type: 'object', properties: {
-      context: { type: 'string', description: 'Required: project-slug[/taxonomy/prefix]. Project lookup or creation is automatic.' },
+      context: { type: 'string', description: 'Required: project-slug[/taxonomy/prefix].' },
+      create_if_missing: { type: 'boolean', description: 'Optional; default false. Set true only after the user explicitly confirms creating a missing Visual QA project named from the project slug.' },
     }, required: ['context'] },
   },
   { name: 'vis_get_context', description: 'Return the current process-local Vispector project context. Use the vis-context skill for workflow guidance.', inputSchema: { type: 'object', properties: {} } },
