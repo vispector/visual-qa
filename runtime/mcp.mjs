@@ -3,8 +3,8 @@ import { readFile, stat } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { randomUUID } from 'node:crypto';
 
-export async function readImage(path) {
-  const absolute = resolve(path);
+export async function readImage(path, workingDirectory = process.env.VISPECTOR_WORKING_DIR || process.cwd()) {
+  const absolute = resolve(workingDirectory, path);
   const max = Number(process.env.VISPECTOR_MAX_IMAGE_BYTES || 10 * 1024 * 1024);
   const info = await stat(absolute);
   if (!info.isFile()) throw new Error('Image path must point to a regular file.');
@@ -25,8 +25,8 @@ export async function readImage(path) {
 export class VispectorMCP {
   constructor() {
     this.url = process.env.VISPECTOR_MCP_URL;
-    this.token = process.env.VISPECTOR_MCP_TOKEN || process.env.VISPECTOR_API_KEY;
-    if (!this.url || !this.token) throw new Error('Set VISPECTOR_MCP_URL and VISPECTOR_MCP_TOKEN in the process environment.');
+    this.token = process.env.VISPECTOR_API_KEY || process.env.VISPECTOR_MCP_TOKEN;
+    if (!this.url || !this.token) throw new Error('Set VISPECTOR_MCP_URL and VISPECTOR_API_KEY in the local MCP server environment.');
     this.id = 0;
   }
   async rpc(method, params = {}, notification = false) {

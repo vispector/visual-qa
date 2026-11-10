@@ -5,7 +5,7 @@ description: Inspect a local screenshot and optionally evaluate a natural-langua
 
 Invocation: run the `vis-test` skill (slash command `/vis-test` in clients that support it). Arguments: `<image-path> [taxonomy-path] [predicate]`. Quote natural-language predicates. If the path is omitted, use active conversation context; an explicit path is operation-only. Ask when context is missing or ambiguous.
 
-Run the installed `upload-image.mjs inspect` with the project slug and taxonomy path. It reads local image bytes, submits `run_inspect` once with an idempotency key, and polls `get_inspection` with bounded backoff. Never pass a predicate to MCP and never resubmit while polling. Keep the inspection ID, pinned revision, returned workspace version, and original result as the source record for the inspection.
+Call local MCP `vis_upload_image` with `mode: "inspect"`, the image path, and an optional taxonomy path override. It reads the image locally, submits `run_inspect` once to authenticated remote MCP with an idempotency key, and polls `get_inspection` by the accepted ID. Never read or pass image bytes/base64 through model context, pass a predicate to MCP, or resubmit while polling. Keep the inspection ID, pinned revision, returned workspace version, and original result as the source record for the inspection.
 
 For Visual QA map `SUPPORTED` to inspection PASS, `CONTRADICTED` to FAIL, and `INSUFFICIENT_EVIDENCE` to INCONCLUSIVE. Failures, timeouts, unknown project types, and context errors are execution errors or explicit unsupported mappings, never visual FAIL. Include the pinned revision and workspace version when reporting results.
 
